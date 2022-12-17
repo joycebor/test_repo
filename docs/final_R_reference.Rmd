@@ -1,0 +1,340 @@
+---
+title: "R Reference Guide"
+author: "Joyce Bor"
+date: "12-08-2022"
+output: html_document
+df_print: paged
+---
+
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
+A package in R is a collection of pre-built functions. In order to install these packages, we use this function:
+
+* install.packages("packageName")  
+After the package is installed, you call the packages using either of the following functions:
+* library()  
+* require()  
+In our example, we we install our **palmerpenguins** data and load it to our directory:  
+
+```{r}
+options(repos = list(CRAN="http://cran.rstudio.com/"))
+#install package
+install.packages("palmerpenguins")
+#load package
+library(palmerpenguins)
+```
+
+We call this "loading a package" in R.  
+Note that you do not need to use quotes around the package name when loading a package.  
+This package is designed to simplify tasks within an *RProject*. The function **here()** returns the absolute path to the base directory of your *RProject*.  
+For this example, let us assume that:  
+
+* You are working on RStudio and have an RProject loaded.    
+* You have a subdirectory of your main RProject called *data*.  
+* In your data subfolder, there is a file called *.csv*.  
+
+This package most  useful for opening and reading data.
+In this example, we will load the here package, and then read our ginkgo data, which is found in our *data* subfolder.  
+
+```{r}
+library(here)
+dat_ginkgo = read.csv(
+  here("/Users/joycebor/Documents/environmental_data/data", "ginkgo_data_2022.csv")
+  )
+```
+
+
+
+## Data Structures  
+
+A data structure is a format for organizing, processing, and storing data. In R, the basic data structures are:   
+
+* **Vectors**  
+A vector in R is the most basic type of object. It is a sequence of data elements of the same type.  
+To create a vector in R, we use the combine function **c()**.  
+Vector elements are separated by commas and placed in parentheses.  
+*Example*  
+```{r}
+numeric_vector <- c(1, 2, 3)  
+character_vector <- c("x", "y", "z")  
+```
+
+* **Lists**  
+A list in R allows you to gather a variety of objects under one name. Unlike in a vector or a matrix, these objects do not have to be of the same type. They can be matrices, vectors, data frames, or other lists. To create a list, we use the function **list()**.  
+*Example*  
+```{r}
+#creating the list
+list1 = list("a", 3, 372, "dog", "biscuits")
+#calling the list
+list1
+```
+- To create a named list, we can use the following code:  
+```{r}
+list2 = list(name1 = "a", name2 = "b")
+```
+- To name a list that has already been created:  
+```{r}
+list2 = list("a", "b")
+names(list2) = c("name1", "name2")
+```
+  
+* length() can be used to find the length of a list or any data set in r as follows:  
+```{r}
+length(list1)
+```
+
+
+* **Matrices**  
+A matrix in R is a collection of elements of the same data type arranged in rows and columns.  
+To create a matrix in R, we use the **matrix()** function.  
+*Example*  
+```{r}
+matrix(1:6, byrow = TRUE, nrow = 2)
+```
+The first argument is the collection of elements in the matrix. Another way to write 1:6 is:  
+c(1, 2, 3, 4, 5, 6)  
+The second argument, *byrow*, tells R to fill the matrix by rows. To fill the matrix by columns, we use:  
+byrow = FALSE  
+The third argument, **nrow**, tells R to create a matrix with 2 rows.  
+
+
+
+* **Data frames**  
+A data frame in R has the variables of a dataset as columns and the observations as rows. In our example, we will use our ginkgo data frame. This file is found in the index.Rmd file, and we have downloaded it into our *data* subfolder.  
+```{r}
+#reading ginkgo data
+#make sure you are working in the right directory
+require(here)
+dat_ginkgo = read.csv(
+  here("/Users/joycebor/Documents/environmental_data/data", "ginkgo_data_2022.csv")
+  )
+```
+When working with a large dataset, it is important to have a clear understanding of its structure. The following functions are useful when doing this:  
+- head()  
+This shows the first observations of a data frame.  
+- tail()  
+This shows the last observations of the data frame.  
+- str()  
+This shows the structure of the dataset, e.g, the total number of observations, variables, the full list of variables, the data type of each variable, and the first observations.  
+-nrow()  
+This shows the number of rows in a dataset.  
+-ncol()  
+This shows the number of columns in a dataset.  
+-dim()  
+This is used to set of get the dimensions of a dataset.  
+
+```{r}
+# summary of dataset
+head(dat_ginkgo)
+tail(dat_ginkgo)
+str(dat_ginkgo)
+nrow(dat_ginkgo)
+ncol(dat_ginkgo)
+dim(dat_ginkgo)
+```
+* **Factors**  
+A factor in R is used to store categorical variable. A categorical variable belongs to a limited number of categories, while a continuous variable can correspond to an infinite number of values. An example of a categorical variable is sex. Say you have a vector containing the sex of 3 different individuals. We use the function **factor()** on the vector to store the categorical variables or 'factor levels':  
+```{r}
+#create vector
+sex_vec = c("Male", "Female", "Male")
+#convert into factor
+factor_sex_vec = factor(sex_vec)
+```
+Sometimes, when working with a data set that contains factors with specific factor levels, we might want to change the names of these levels for clarity. We use the function **levels()** for this:
+```{r}
+#r vector
+sex_vec = c("M", "F", "M")
+# r factor
+factor_sex_vec = factor(sex_vec)
+#find levels
+levels(factor_sex_vec)
+#correctly assign the levels or R will assign them alphabetically. Correctly map "F" to "Female" and "M" to "Male".
+levels(factor_sex_vec) = c("Female", "Male")
+#calling the factor
+factor_sex_vec
+```
+
+
+## Subsetting  
+
+Subsetting refers to selecting variables and observations from a data structure. There are 3 main methods to do this. We will use our ginkgo data to demonstrate them below.   
+
+* **By name**  
+To subset a data frame by name, we use the **$** as follows:  
+```{r}
+#selecting the row in our ginkgo data with maximum widths.
+dat_ginkgo$max_width
+```
+* **By position**
+We use square brackets **[]** to select objects in a specific row and column respectively.  
+```{r}
+#selecting the first row of ginkgo data
+dat_ginkgo[1,]
+#selecting the element in row 2 and column 3 of ginkgo data
+dat_ginkgo[2,3]
+#selecting the 3rd column of the gingko data
+dat_ginkgo[,3]
+```
+* **subset()** 
+This function is used to select the object specified in the brackets. The arguments of this function include the object to be subsetted and a logical expression that indicates the elements or rows to keep. 
+In this example, we are using the penguins data to select all the data associated with the Adelie species:  
+```{r}
+options(repos = list(CRAN="http://cran.rstudio.com/"))
+#install and load palmerpenguins data
+install.packages("palmerpenguins")
+require(palmerpenguins)
+#subsetting Adelie species
+subset(penguins, species == "Adelie")
+```
+
+
+## Numerical Data Exploration
+
+Numerical data exploration is important for getting a compact summary of data, including aspects sych as the mean, median, range, variance and standard deviation.    
+*Example*  
+```{r}
+#gives a summary of data in a dataset
+summary(dat_ginkgo)
+#returns the mean of the maximum widths in ginkgo data
+mean(na.omit(dat_ginkgo$max_width))
+#returns the standard deviation of the maximum depths in ginkgo data
+sd(na.omit(dat_ginkgo$max_depth))
+```
+**na.omit()** removes all NA values from the data set we are performing the numerical methods.  
+
+## Graphical Data Exploration
+
+This enables us to get visual or intuitive representation of the data using graphs/plots. We can create scatterplots, histograms and boxplots.  
+
+* **plot()**  
+This function creates a scatterplot using the following main arguments:  
+x, y: the x and y coordinates of the plot.  
+main: the main title of the plot.  
+xlab: a label for the x axis.  
+ylab: a label for the y axis.  
+xlim: the x limits of the plot.  
+ylim: the y limits of the plot.  
+col: the colors for lines and points.  
+pch: a vector of plotting symbols.  
+cex: a vector giving the scale of he plotting symbols.  
+
+
+We are going to create a scatterplot of maximum leaf depth (x) and maximum leaf width (y) using the ginkgo data:  
+```{r}
+max(dat_ginkgo$max_width)
+max(dat_ginkgo$max_depth)
+#creating a scatterplot
+plot(dat_ginkgo$max_depth, dat_ginkgo$max_width,
+     main = "Maximum Leaf Length vs Maximum Leaf Width",
+     xlab = "Maximum Leaf Depth",
+     ylab = "Maximum Leaf Width",
+     xlim = c(0, 125),
+     ylim = c(0, 145),
+     col = "red",
+     pch = 1,
+     cex = 0.5)
+```
+
+* **hist()**
+This function computes a histogram od the given data using the following main arguments:  
+x: a vector of values to be plotted on the histogram.  
+breaks: a vector giving breakpoints between histogram cells, a function to compute the vector, a single number giving the number of cells desired, a character string naming an algorithm to compute the number of cells, or a function to compute the number of cells.  
+We are going to create a histogram of the flipper lengths of the penguins.  
+```{r}
+#creating a histogram with 15 cells
+hist(penguins$flipper_length_mm, breaks = 15)
+```
+* **boxplot()**  
+Boxplots measure how well distributed data is in a data set.  
+```{r}
+#simple boxplot of ginkgo petiole lengths.
+boxplot(dat_ginkgo$petiole_length,
+        main = "Boxplot of Petiole Length",
+        xlab = "Petiole Length")
+```
+```{r}
+#conditional boxplot of maximum depth conditioned on seeds present.
+boxplot(dat_ginkgo$max_depth ~ dat_ginkgo$seeds_present,
+        main = "Boxplot of Maximum Leaf Depth Conditioned on Presence of seeds",
+        xlab = NULL,
+        ylab = "Maximum Leaf Depth")
+```
+...
+
+We can create a panel with multiple plots at the same time using **par()**. This function uses the argument **mfrow** to determine a vector with row and column values for the grid, as shown below:  
+```{r}
+#creating a 4-panel figure of histograms arranged in a 2 by 2 matrix from our ginkgo data.
+par(mfrow = c(2, 2))
+hist(dat_ginkgo$max_depth, main = "Histogram of maximum Depths", xlab = "Maximum Depth")
+hist(dat_ginkgo$max_width, main = "Histogram of Maximum Widths", xlab = "Maximum Width")
+hist(dat_ginkgo$notch_depth, main = "Histogram of Notch Depths", xlab = "Notch Depth")
+hist(dat_ginkgo$petiole_length, main = "Histogram of Petiole Lengths", xlab = "Petiole Length")
+```
+
+## Distribution Functions
+Distributions are tools for describing the likelihood of observing specific events from the set of all possible events. The main distributions used in data analysis are binomial, normal, and poisson distributions.  
+A binomial has 2 parameters:  
+- n: number of trials.  
+- p: the probability of success in an individual trial.  
+The following functions are used to generate binomial distributions in r:  
+
+* **dbinom()**  
+This function returns the value of the probability density function of the binomial distribution of a certain random variable. It has the following arguments:  
+x (the random variable)  
+size (the number of trials)  
+prob (the probability of success for each trial)  
+*Example*  
+```{r}
+#find the probability of 8 successes during 16 trials, where the probability of success on each trial is 0.7
+dbinom(x = 8, size = 16, prob = 0.7)
+```
+
+* **pbinom()**  
+This function returns the value of the cumulative density function of the binomial distribution of a certain random variable. It has the same arguments as the dbinom() function. It returns the area to the left of a given value q in a binomial distribution. To find the area to the right instead, we use the argument: **lower.tail = FALSE**.  
+
+```{r}
+# find the probability of more than 3 success in 6 trials, where the probability of success on each trial is 0.5
+pbinom(q = 3, size = 6, prob = 0.5, lower.tail = FALSE)
+```
+
+* **qbinom()**  
+This function returns the value of the inverse cumulative density function of the binomial distribution of a random variable. It is used to find the quantile specified of the binomial distribution and has the same arguments as the pbinom() and dbinom().  
+
+```{r}
+#find the 20th quantile of a binomial distribution with 50 trials, where the probability of success on each trial is 0.5
+qbinom(0.20, size = 50, prob = 0.5)
+```
+
+A normally distributed data set in R usually means that the data is from a random collection of independent sources. When plotted with the value of the variable on the x axis and the count of the values in the y axis, we observe a bell shape curve, the center of which corresponds to the mean of the data set. The following are used to generate normal distributions in R.  
+
+* **dnorm()**  
+This returns the value of the probability density function of a normal distribution. It has the following arguments:  
+x (the random variable)  
+mean (population mean)  
+sd (population standard deviation)  
+
+```{r}
+#find the value of the standard normal distribution at x = 5, with mean set to 0 and standard deviation set to 1.
+dnorm(x = 5, mean = 0, sd = 1)
+```
+
+* **pnorm()**  
+This returns the value of the cumulative density function of the normal distribution of a random variable. It has the same arguments as dnorm(), and the following logical argument:  
+lower.tail = FALSE: this assumes the area to the right of the specified variable.  
+```{r}
+#finding the percentage of plants that are taller than 6 inches when the mean of the heights of the plants is 4.5 inches and the standard deviation is 0.2 inches
+pnorm(6, mean = 4.5, sd = 0.2, lower.tail = FALSE)
+```
+
+* **rnorm()**  
+This generates a vector of normally distributed random variables with the following arguments:  
+n (vector length)  
+mean (vector of means)  
+sd (vector standard deviation)  
+
+```{r}
+#generating a vector of 15 normally distributed random variables with a mean of 100 and standard deviation of 3.
+rnorm(15, mean = 100, sd = 3)
+```

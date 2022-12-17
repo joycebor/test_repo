@@ -9,4 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Welcome to my class page!
+Welcome to my class page!  
+
+The link below will take you to an R reference guide I created, which contains all the basic concepts and a general overview if concepts in R:  
+
+
+[Final Project: R Reference Guide](final_R_reference.html)
